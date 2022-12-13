@@ -23,12 +23,12 @@ while getopts "f:" option
 do
     case "${option}" in
         f) var_outputfile=${OPTARG};;
-        *) print_usage
+        *) print_usage     
     esac
 done
 
 # check arguments
-if [ -z "${var_outputfile}" ]; then print_usage; fi
+if [ -z "${var_outputfile}" ]; then var_outputfile="1pass-$(date '+%Y%m%d-%H%M%S').bak"; fi
 
 # signin to 1Password
 echo "1Password Cloud Backup"
@@ -49,7 +49,7 @@ done
 
 # encrypt items and write to output file
 echo "- store items in encrypted output file ${var_outputfile}..."
-echo $output | openssl enc -e -aes256 -pass pass:$(${tool_op} read op://Private/1Password\ Account/password) > ${var_outputfile}
+echo $output | gpg -c --no-symkey-cache --batch --passphrase $(${tool_op} read op://Private/1Password\ Account/password) -o ${var_outputfile}
 
 # signout from 1Password
 echo "- signout from 1Password"
