@@ -37,19 +37,19 @@ eval $(${tool_op} signin)
 
 # get a list of all items
 echo "- get list of all items from 1Password..."
-items=$(${tool_op} list items | ${tool_jq} --raw-output '.[].uuid')
+items=$(${tool_op} items list --format=json --cache | ${tool_jq} --raw-output '.[].id')
 
 # get all items from 1Password
 output=""
 for item in $items
 do
     echo "  - get item ${item}..."
-    output+=$(${tool_op} get item ${item})
+    output+=$(${tool_op} items get ${item} --format=json --cache) 
 done
 
 # encrypt items and write to output file
 echo "- store items in encrypted output file ${var_outputfile}..."
-echo $output | openssl enc -e -aes256 > ${var_outputfile}
+echo $output | openssl enc -e -aes256 -pass pass:$(${tool_op} read op://Private/1Password\ Account/password) > ${var_outputfile}
 
 # signout from 1Password
 echo "- signout from 1Password"
