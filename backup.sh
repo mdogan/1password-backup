@@ -10,25 +10,25 @@
 print_usage()
 {
     echo "1Password Cloud Backup"
-    echo "usage: $0 -f <output file>"
+    echo "usage: $0 -d <output dir>"
     exit 0
 }
 
 # define variables
 tool_op="op"
 tool_jq="jq"
+output_dir="."
 
 # parse arguments
-while getopts "f:" option
+while getopts "d:" option
 do
     case "${option}" in
-        f) var_outputfile=${OPTARG};;
+        d) output_dir=${OPTARG};;
         *) print_usage     
     esac
 done
 
-# check arguments
-if [ -z "${var_outputfile}" ]; then var_outputfile="1pass-$(date '+%Y%m%d-%H%M%S').bak"; fi
+output_file="${output_dir}/1pass-$(date '+%Y%m%d-%H%M%S').bak"
 
 # signin to 1Password
 echo "1Password Cloud Backup"
@@ -48,8 +48,8 @@ do
 done
 
 # encrypt items and write to output file
-echo "- store items in encrypted output file ${var_outputfile}..."
-echo $output | gpg -c --no-symkey-cache --batch --passphrase $(${tool_op} read op://Private/1Password\ Account/password) -o ${var_outputfile}
+echo "- store items in encrypted output file ${output_file}..."
+echo $output | gpg -c --no-symkey-cache --batch --passphrase $(${tool_op} read op://Private/1Password\ Account/password) -o "${output_file}"
 
 # signout from 1Password
 echo "- signout from 1Password"
