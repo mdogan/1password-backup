@@ -40,12 +40,16 @@ echo "- get list of all items from 1Password..."
 items=$(${tool_op} items list --format=json --cache | ${tool_jq} --raw-output '.[].id')
 
 # get all items from 1Password
-output=""
+output="["
 for item in $items
 do
     echo "  - get item ${item}..."
     output+=$(${tool_op} items get ${item} --format=json --cache) 
+    output+=","
 done
+
+output=${output%,}
+output+="]"
 
 # encrypt items and write to output file
 echo "- store items in encrypted output file ${output_file}..."
